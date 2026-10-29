@@ -134,8 +134,9 @@
 <div id="aviso"></div>
 
 <script>
-// Endereço da API. Se a API rodar em outra porta ou máquina, altere aqui.
-const API = "http://127.0.0.1:8000";
+// Vazio = mesma origem: o index.html é servido pela própria API (uvicorn bib:app).
+// Se abrir o front separado, use "http://127.0.0.1:8000".
+const API = "";
 
 /* ---------- utilidades ---------- */
 let avisoTimer;
