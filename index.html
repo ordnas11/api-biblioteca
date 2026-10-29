@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biblioteca</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #667085;
+    --line: #e1e4ea; --accent: #2457d6; --accent-text: #ffffff;
+    --danger: #c0392b; --ok: #1e7a46;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171d; --card: #1d222b; --text: #e8eaf0; --muted: #98a0b0;
+      --line: #2f3643; --accent: #5b8cff; --accent-text: #0e1320;
+      --danger: #ff7a6b; --ok: #5fd08f;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, Segoe UI, Arial, sans-serif;
+         background: var(--bg); color: var(--text); }
+  header { padding: 18px 24px; border-bottom: 1px solid var(--line); background: var(--card); }
+  header h1 { margin: 0; font-size: 20px; }
+  nav { display: flex; gap: 6px; padding: 12px 24px 0; flex-wrap: wrap; }
+  nav button { border: 1px solid var(--line); background: var(--card); color: var(--text);
+               padding: 8px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 14px; }
+  nav button.ativo { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  main { padding: 0 24px 40px; max-width: 1100px; }
+  section { display: none; background: var(--card); border: 1px solid var(--line);
+            border-radius: 0 8px 8px 8px; padding: 20px; }
+  section.ativo { display: block; }
+  h2 { margin: 0 0 14px; font-size: 17px; }
+  .form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; align-items: end; }
+  .campo { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  input, select { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+                  background: var(--bg); color: var(--text); font-size: 14px; min-width: 150px; }
+  button.principal { background: var(--accent); color: var(--accent-text); border: 0;
+                     padding: 9px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+  button.mini { background: transparent; border: 1px solid var(--line); color: var(--text);
+                padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+  button.mini.perigo { color: var(--danger); border-color: var(--danger); }
+  .tabela-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  .vazio { color: var(--muted); padding: 14px 4px; }
+  #aviso { position: fixed; right: 20px; bottom: 20px; padding: 12px 16px; border-radius: 8px;
+           background: var(--card); border: 1px solid var(--line); display: none; max-width: 340px;
+           font-size: 14px; box-shadow: 0 4px 14px rgba(0,0,0,.15); }
+  #aviso.erro { border-color: var(--danger); color: var(--danger); }
+  #aviso.sucesso { border-color: var(--ok); color: var(--ok); }
+</style>
+</head>
+<body>
+
+<header><h1>Sistema de Biblioteca</h1></header>
+
+<nav id="abas">
+  <button data-aba="alunos" class="ativo">Alunos</button>
+  <button data-aba="atendentes">Atendentes</button>
+  <button data-aba="livros">Livros</button>
+  <button data-aba="exemplares">Exemplares</button>
+  <button data-aba="emprestimos">Empréstimos</button>
+</nav>
+
+<main>
+
+  <!-- ALUNOS -->
+  <section id="alunos" class="ativo">
+    <h2>Alunos</h2>
+    <div class="form">
+      <label class="campo">CPF<input id="al-cpf" maxlength="11"></label>
+      <label class="campo">Nome<input id="al-nome"></label>
+      <label class="campo">RA<input id="al-ra" maxlength="9"></label>
+      <label class="campo">Nascimento<input id="al-nasc" type="date"></label>
+      <button class="principal" onclick="cadastrarAluno()">Cadastrar</button>
+    </div>
+    <div class="tabela-wrap"><table id="t-alunos"></table></div>
+  </section>
+
+  <!-- ATENDENTES -->
+  <section id="atendentes">
+    <h2>Atendentes</h2>
+    <div class="form">
+      <label class="campo">CPF<input id="at-cpf" maxlength="11"></label>
+      <label class="campo">Nome<input id="at-nome"></label>
+      <label class="campo">Matrícula<input id="at-mat" maxlength="10"></label>
+      <label class="campo">Telefone<input id="at-tel" maxlength="15"></label>
+      <button class="principal" onclick="cadastrarAtendente()">Cadastrar</button>
+    </div>
+    <div class="tabela-wrap"><table id="t-atendentes"></table></div>
+  </section>
+
+  <!-- LIVROS -->
+  <section id="livros">
+    <h2>Livros</h2>
+    <div class="form">
+      <label class="campo">Título<input id="lv-titulo"></label>
+      <label class="campo">Autor<input id="lv-autor"></label>
+      <label class="campo">Editora<input id="lv-editora"></label>
+      <label class="campo">Ano<input id="lv-ano" type="number" min="0" max="2100"></label>
+      <button class="principal" onclick="cadastrarLivro()">Cadastrar</button>
+    </div>
+    <div class="tabela-wrap"><table id="t-livros"></table></div>
+  </section>
+
+  <!-- EXEMPLARES -->
+  <section id="exemplares">
+    <h2>Exemplares</h2>
+    <div class="form">
+      <label class="campo">Livro<select id="ex-livro"></select></label>
+      <label class="campo">Código de barras<input id="ex-cod" maxlength="20"></label>
+      <label class="campo">Aquisição<input id="ex-data" type="date"></label>
+      <button class="principal" onclick="cadastrarExemplar()">Cadastrar</button>
+    </div>
+    <div class="tabela-wrap"><table id="t-exemplares"></table></div>
+  </section>
+
+  <!-- EMPRÉSTIMOS -->
+  <section id="emprestimos">
+    <h2>Empréstimos</h2>
+    <div class="form">
+      <label class="campo">Aluno<select id="em-aluno"></select></label>
+      <label class="campo">Exemplar disponível<select id="em-exemplar"></select></label>
+      <label class="campo">Atendente<select id="em-atendente"></select></label>
+      <button class="principal" onclick="cadastrarEmprestimo()">Registrar empréstimo</button>
+    </div>
+    <div class="tabela-wrap"><table id="t-emprestimos"></table></div>
+  </section>
+
+</main>
+
+<div id="aviso"></div>
+
+<script>
+// Endereço da API. Se a API rodar em outra porta ou máquina, altere aqui.
+const API = "http://127.0.0.1:8000";
+
+/* ---------- utilidades ---------- */
+let avisoTimer;
+function aviso(texto, erro = false) {
+  const el = document.getElementById("aviso");
+  el.textContent = texto;
+  el.className = erro ? "erro" : "sucesso";
+  el.style.display = "block";
+  clearTimeout(avisoTimer);
+  avisoTimer = setTimeout(() => (el.style.display = "none"), 4500);
+}
+
+async function api(caminho, metodo = "GET", corpo = null) {
+  const opts = { method: metodo, headers: {} };
+  if (corpo) {
+    opts.headers["Content-Type"] = "application/json";
+    opts.body = JSON.stringify(corpo);
+  }
+  let resp;
+  try {
+    resp = await fetch(API + caminho, opts);
+  } catch (e) {
+    aviso("Não foi possível conectar à API. Ela está rodando?", true);
+    return null;
+  }
+  const dados = await resp.json().catch(() => null);
+  if (!resp.ok) {
+    const msg = dados && typeof dados.detail === "string"
+      ? dados.detail
+      : "Dados inválidos. Confira os campos.";
+    aviso(msg, true);
+    return null;
+  }
+  return dados;
+}
+
+const val = id => document.getElementById(id).value.trim();
+const limpar = (...ids) => ids.forEach(id => (document.getElementById(id).value = ""));
+const fmtData = v => (v ? v.split("-").reverse().join("/") : "—");
+
+// Monta a tabela com createElement/textContent (sem risco de injetar HTML)
+function tabela(id, colunas, linhas, acao) {
+  const t = document.getElementById(id);
+  t.replaceChildren();
+  if (!linhas || linhas.length === 0) {
+    const p = document.createElement("div");
+    p.className = "vazio";
+    p.textContent = "Nenhum registro.";
+    t.replaceChildren(p);
+    return;
+  }
+  const thead = t.createTHead().insertRow();
+  colunas.forEach(c => (thead.insertCell().outerHTML = `<th>${c.h}</th>`));
+  if (acao) thead.insertCell().outerHTML = "<th></th>";
+  const tbody = t.createTBody();
+  linhas.forEach(l => {
+    const tr = tbody.insertRow();
+    colunas.forEach(c => {
+      const v = l[c.k];
+      tr.insertCell().textContent = c.f ? c.f(v) : (v ?? "—");
+    });
+    if (acao) {
+      const td = tr.insertCell();
+      const b = acao(l);
+      if (b) td.appendChild(b);
+    }
+  });
+}
+
+function botao(texto, aoClicar, perigo = false) {
+  const b = document.createElement("button");
+  b.className = "mini" + (perigo ? " perigo" : "");
+  b.textContent = texto;
+  b.onclick = aoClicar;
+  return b;
+}
+
+function preencherSelect(id, itens, valor, rotulo) {
+  const s = document.getElementById(id);
+  s.replaceChildren();
+  if (itens.length === 0) {
+    s.add(new Option("(nenhum cadastrado)", ""));
+    return;
+  }
+  itens.forEach(i => s.add(new Option(rotulo(i), i[valor])));
+}
+
+/* ---------- abas ---------- */
+const carregadores = {
+  alunos: carregarAlunos,
+  atendentes: carregarAtendentes,
+  livros: carregarLivros,
+  exemplares: carregarExemplares,
+  emprestimos: carregarEmprestimos,
+};
+
+document.getElementById("abas").addEventListener("click", e => {
+  const aba = e.target.dataset.aba;
+  if (!aba) return;
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("ativo", b === e.target));
+  document.querySelectorAll("section").forEach(s => s.classList.toggle("ativo", s.id === aba));
+  carregadores[aba]();
+});
+
+/* ---------- alunos ---------- */
+async function carregarAlunos() {
+  const dados = await api("/alunos");
+  if (!dados) return;
+  tabela("t-alunos", [
+    { h: "CPF", k: "CPF_ALUNO" },
+    { h: "Nome", k: "NOME_ALUNO" },
+    { h: "RA", k: "RA_ALUNO" },
+    { h: "Nascimento", k: "DATA_NASCIMENTO", f: fmtData },
+  ], dados, a => botao("Excluir", () => excluirAluno(a.CPF_ALUNO), true));
+}
+
+async function cadastrarAluno() {
+  const r = await api("/alunos", "POST", {
+    cpf_aluno: val("al-cpf"),
+    nome_aluno: val("al-nome"),
+    ra_aluno: val("al-ra"),
+    data_nascimento: val("al-nasc"),
+  });
+  if (r) { aviso(r.mensagem); limpar("al-cpf", "al-nome", "al-ra", "al-nasc"); carregarAlunos(); }
+}
+
+async function excluirAluno(cpf) {
+  if (!confirm("Excluir este aluno?")) return;
+  const r = await api(`/alunos/${cpf}`, "DELETE");
+  if (r) { aviso(r.mensagem); carregarAlunos(); }
+}
+
+/* ---------- atendentes ---------- */
+async function carregarAtendentes() {
+  const dados = await api("/atendentes");
+  if (!dados) return;
+  tabela("t-atendentes", [
+    { h: "CPF", k: "CPF_ATENDENTE" },
+    { h: "Nome", k: "NOME_ATENDENTE" },
+    { h: "Matrícula", k: "MATRICULA" },
+    { h: "Telefone", k: "TELEFONE" },
+  ], dados);
+}
+
+async function cadastrarAtendente() {
+  const r = await api("/atendentes", "POST", {
+    cpf_atendente: val("at-cpf"),
+    nome_atendente: val("at-nome"),
+    matricula: val("at-mat"),
+    telefone: val("at-tel") || null,
+  });
+  if (r) { aviso(r.mensagem); limpar("at-cpf", "at-nome", "at-mat", "at-tel"); carregarAtendentes(); }
+}
+
+/* ---------- livros ---------- */
+async function carregarLivros() {
+  const dados = await api("/livros");
+  if (!dados) return;
+  tabela("t-livros", [
+    { h: "ID", k: "ID_LIVRO" },
+    { h: "Título", k: "TITULO_LIVRO" },
+    { h: "Autor", k: "AUTOR_LIVRO" },
+    { h: "Editora", k: "EDITORA" },
+    { h: "Ano", k: "ANO_PUBLICACAO" },
+  ], dados);
+}
+
+async function cadastrarLivro() {
+  const ano = val("lv-ano");
+  const r = await api("/livros", "POST", {
+    titulo_livro: val("lv-titulo"),
+    autor_livro: val("lv-autor"),
+    editora: val("lv-editora") || null,
+    ano_publicacao: ano ? parseInt(ano, 10) : null,
+  });
+  if (r) { aviso(r.mensagem); limpar("lv-titulo", "lv-autor", "lv-editora", "lv-ano"); carregarLivros(); }
+}
+
+/* ---------- exemplares ---------- */
+async function carregarExemplares() {
+  const [livros, exemplares] = await Promise.all([api("/livros"), api("/exemplares")]);
+  if (!livros || !exemplares) return;
+  preencherSelect("ex-livro", livros, "ID_LIVRO", l => `${l.TITULO_LIVRO} (#${l.ID_LIVRO})`);
+  tabela("t-exemplares", [
+    { h: "ID", k: "ID_EXEMPLAR" },
+    { h: "Livro", k: "TITULO_LIVRO" },
+    { h: "Código", k: "CODIGO_BARRAS" },
+    { h: "Status", k: "STATUS_EXEMPLAR" },
+    { h: "Aquisição", k: "DATA_AQUISICAO", f: fmtData },
+  ], exemplares);
+}
+
+async function cadastrarExemplar() {
+  const idLivro = val("ex-livro");
+  if (!idLivro) { aviso("Cadastre um livro primeiro.", true); return; }
+  const r = await api("/exemplares", "POST", {
+    id_livro: parseInt(idLivro, 10),
+    codigo_barras: val("ex-cod"),
+    data_aquisicao: val("ex-data") || null,
+  });
+  if (r) { aviso(r.mensagem); limpar("ex-cod", "ex-data"); carregarExemplares(); }
+}
+
+/* ---------- empréstimos ---------- */
+async function carregarEmprestimos() {
+  const [alunos, atendentes, exemplares, emprestimos] = await Promise.all([
+    api("/alunos"), api("/atendentes"), api("/exemplares"), api("/emprestimos"),
+  ]);
+  if (!alunos || !atendentes || !exemplares || !emprestimos) return;
+
+  preencherSelect("em-aluno", alunos, "CPF_ALUNO", a => `${a.NOME_ALUNO} (RA ${a.RA_ALUNO})`);
+  preencherSelect("em-atendente", atendentes, "CPF_ATENDENTE", a => a.NOME_ATENDENTE);
+  preencherSelect(
+    "em-exemplar",
+    exemplares.filter(e => e.STATUS_EXEMPLAR === "DISPONIVEL"),
+    "ID_EXEMPLAR",
+    e => `${e.TITULO_LIVRO} [${e.CODIGO_BARRAS}]`
+  );
+
+  tabela("t-emprestimos", [
+    { h: "ID", k: "ID_EMPRESTIMO" },
+    { h: "Aluno", k: "NOME_ALUNO" },
+    { h: "Livro", k: "TITULO_LIVRO" },
+    { h: "Exemplar", k: "CODIGO_BARRAS" },
+    { h: "Atendente", k: "NOME_ATENDENTE" },
+    { h: "Empréstimo", k: "DATA_EMPRESTIMO", f: fmtData },
+    { h: "Devolver até", k: "DATA_DEVOLUCAO", f: fmtData },
+    { h: "Entregue em", k: "DATA_ENTREGA", f: fmtData },
+  ], emprestimos, e => e.DATA_ENTREGA ? null : botao("Devolver", () => devolver(e.ID_EMPRESTIMO)));
+}
+
+async function cadastrarEmprestimo() {
+  const cpfAluno = val("em-aluno"), idEx = val("em-exemplar"), cpfAt = val("em-atendente");
+  if (!cpfAluno || !idEx || !cpfAt) {
+    aviso("Selecione aluno, exemplar disponível e atendente.", true);
+    return;
+  }
+  const r = await api("/emprestimos", "POST", {
+    cpf_aluno: cpfAluno,
+    id_exemplar: parseInt(idEx, 10),
+    cpf_atendente: cpfAt,
+  });
+  if (r) { aviso(`${r.mensagem} (prazo: ${r.prazo_dias} dias)`); carregarEmprestimos(); }
+}
+
+async function devolver(id) {
+  const r = await api(`/emprestimos/${id}/devolver`, "PUT");
+  if (r) { aviso(r.mensagem); carregarEmprestimos(); }
+}
+
+/* ---------- início ---------- */
+carregarAlunos();
+</script>
+</body>
+</html>
